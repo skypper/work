@@ -1,0 +1,607 @@
+LABORATORUL 2
+1) Să se obţină in $t3 valoarea: [x/y] * {y/x}, unde x este valoare stocată în $t1 şi y
+este valoarea stocată în $t2, unde s-a notat cu [ ] câtul şi cu {} restul împărţirii.
+
+.data
+.text
+main:
+div $t4, $t1, $t2
+rem $t5, $t1, $t2
+mul $t3, $t4, $t5
+li $v0, 10
+syscall
+
+2) Să se obţină în $t3 valoarea |x-y| , unde x este valoarea din registrul $t1 şi y este
+valoarea din registrul $t2.
+
+.data
+.text
+main:
+sub $t4, $t1, $t2
+abs $t3, $t4
+li $v0, 10
+syscall
+
+1) Să se evalueze expresia logică (x OR y) AND (NOT z) XOR w, unde x este
+valoarea din $t1, y din $t2, z din $t3 şi w din $t4 şi să se memoreze rezultatul 
+în $t5.
+
+.data
+.text
+main:
+or $t5, $t1, $t2
+not $t3, $t3
+and $t5, $t5, $t3
+xor $t5, $t5, $t4
+li $v0, 10
+syscall
+
+2) Introduceţi în registrul $t1 valoarea 0x25, folosind numai instrucţiuni logice.
+.data
+.text
+main:
+ori $t1, $0, 0x25
+li $v0, 10
+syscall
+
+1) În registrul t0 se găseşte valoarea 0x1234. Obţineţi în registrul t2 valoarea
+0x91a0 utilizând o instrucţiune de shiftare sau rotaţie.
+0x1234 = 4660
+0x91a0 = 37280
+37280 / 4660 = 8 = 2^3
+0x1234 --(>>3)--> 0x91a0
+
+.data
+.text
+main:
+li $t0, 0x1234
+sll $t0, $t0, 3
+li $v0, 10
+syscall
+
+2) În registrul t0 se găseşte valoarea 0x12345678. Obţineţi în registrul t1 valoarea 
+0xc091a2b3 utilizând o instrucţiune de shiftare sau rotaţie.
+0x12345678 = 0b00010010001101000101011001111000
+0xc091a2b3 = 0b11000000100100011010001010110011
+.data
+.text
+main:
+li $t0, 0x12345678
+ror $t1, $0, 5
+li $v0, 10
+syscall
+
+LABORATORUL 3
+
+1) Introduceţi valorile 1, respectiv 2 în t1, respectiv t2 şi interschimbaţi-le.
+.data
+.text
+main:
+li $t1, 1
+li $t2, 2
+
+li $t3, $t1
+li $t1, $t2
+li $t2, $t3
+
+li $v0, 10
+syscall
+
+2) Scrieţi un program care calculează expresia var3= 8*var1-[var2/16], unde 
+var1=16 şi var2=31. 
+
+.data
+var1: .word 16
+var2: .word 31
+var3: .word 0
+.text
+main:
+lw $t1, var1
+lw $t2, var2
+mul $t1, $t1, 8
+div $t2, $t2, 16
+sub $t3, $t1, $t2
+sw $t3, var3
+li $v0, 10
+syscall
+
+3) Declaraţi 3 variabile x, y şi z de tip word cu valorile 10, 11, 12. 
+a) Încărcaţi în registrul $t1 valoarea word aflată în memorie la adresa lui
+x + 4, fără a utiliza o altă variabilă în afara lui x. Ce valoare este
+aceasta?
+b) Stocaţi pe 2 octeţi, la adresa indicată de x + 8 valoarea 14. 
+.data
+    x: .word 10
+    y: .word 11
+    z: .word 12
+.text
+main:
+# a)
+lw $t1, x + 4 # valoarea lui y, 11
+# b)
+li $t2, 14
+sh $t2, x + 8
+li $v0, 10
+syscall
+
+4) Fie x eticheta la care se memorează valoarea 5, definită ca word. Să se
+memoreze la adresa lui x + 4 valoarea polinomului f = 2x 2 – 4x + 12.
+aceasta?
+.data
+    x: .word 5
+.text
+main:
+    lw $t1, x
+    move $t2, $t1 # x
+    mul $t2, $t2, $t2 # x * 2
+    mul $t2, $t2, 2 # 2 * x * x
+    add $t2, $t2, 12 # 2 * x * x + 12
+    move $t3, $t1
+    mul $t3, $t3, -4
+    add $t2, $t2, $t3
+    
+    sw $t2, x +  4
+    
+    li $v0, 10
+    syscall
+
+LABORATORUL 4
+1. Determinaţi dacă într-unul din regiştrii $t1 - $t5 se găseşte valoarea 7.
+Dacă da, introduceţi valoarea 1 în registrul $t0. Dacă nu, introduceţi 
+valoarea 0 în registrul $t0. 
+
+.data
+
+.text
+    li $t1, 4
+    li $t2, 7
+    li $t3, 4
+    li $t4, 7
+    li $t5, 7
+
+    li $s0, 7
+    li $t0, 0
+
+    beq $t1, $s0, pune_in_t0
+    beq $t2, $s0, pune_in_t0
+    beq $t3, $s0, pune_in_t0
+    beq $t4, $s0, pune_in_t0
+    beq $t5, $s0, pune_in_t0
+
+    j nu_pune
+   
+    pune_in_t0:
+        li $t0, 1
+    nu_pune:
+
+    li $v0, 10
+    syscall
+
+2. Verificaţi dacă numărul stocat în registrul $t1 este pozitiv. Dacă da, puneţi 
+0 în registrul $t2, dacă nu, puneţi 1 în registrul $t2.
+
+.data
+.text
+    li $t1, 10 # valoare de test
+    ble $t1, $0, pune_1
+
+    pune_0:
+        li $t2, 0
+        j gata
+    pune_1:
+        li $t2, 1
+    gata:
+
+    li $v0, 10
+    syscall
+
+1. Declaraţi un şir oarecare de caractere. Determinaţi lungimea şirului, prin
+parcurgerea şi contorizarea locaţiilor de memorie, până când întâlniţi
+caracterul delimitator de final.
+.data
+    string: .asciiz "abcd"
+.text
+    la $s0, string
+    li $s2, -1
+    strlen:
+        lb $s1, ($s0)
+        addi $s0, 1
+        addi $s2, 1
+        bnez $s1, strlen
+
+    move $a0, $s2
+    li $v0, 1
+    syscall
+    li $v0, 10
+    syscall
+
+2. Definiţi un vector de numere întregi de lungime cunoscută. Determinaţi
+suma elementelor pozitive din vector.
+.data
+    v: .word 1, -2, 3, -4, 5
+    n: .word 5
+.text
+main:
+    li $t0, 0 # contor
+    li $t1, 0 # suma
+    lw $t2, n
+    la $t4, v
+    loop:
+        ble $t2, $t0, endloop
+        lw $t3, 0($t4)
+        ble $t3, 0, negativ
+	add $t1, $t1, $t3
+        negativ:
+        addi $t0, $t0, 1
+        addi $t4, $t4, 4
+        j loop
+   endloop:
+    li $v0, 10
+    syscall
+
+Să se citească şi să se afişeze un vector de n elemente întregi, unde n este introdus
+de la tastatură. Să se afişeze un meniu cu următoarele opţiuni:
+1. Suma elementelor;
+2. Ultimul element;
+3. Elementele mai mari decât n;
+4. Ieşire din program.
+La introducerea opţiunii 1, să se afişeze suma elementelor vectorului.
+La introducerea opţiunii 2, să se afişeze ultimul element al vectorului;
+La introducerea opţiunii 3, să se afişeze elementele mai mari decât n;
+La introducerea opţiunii 4, să se oprească execuţia programului.
+
+sursa fisierului: ex_lab4.s
+
+LABORATOR 5:
+1. Pentru un sir de caractere cunoscut, să se determine şirul de
+caractere obţinut prin oglindirea şirului iniţial. De exemplu: pentru
+şirul „sir” se va obţine „ris”. Utilizaţi operaţiile PUSH şi POP.
+
+.data
+string: .asciiz "sir"
+.text
+main:
+	la $t0, string
+	lb $t1, string
+	li $t2, 0
+	loop:
+		bnez $t1, endloop
+
+		# PUSH
+		sb $sp, 0($t1)
+		add $sp, 1
+
+		add $t0, 1
+		lb $t1, 0($t0)
+		add $t2, 1
+		j loop
+	endloop:
+	
+	la $t0, string
+	loop2:
+		b
+		beqz $t2, endloop2
+		sub $sp, 1
+		lb $t1, 0($sp)
+		sb $t1, 0($t0)
+		add $t0, 1
+	endloop2:
+	
+	li $v0, 4
+	la $a0, string
+	syscall
+
+	li $v0, 10
+	syscall
+
+2. Verificaţi dacă un număr dat este palindrom. Utilizaţi stiva.
+TODO
+
+.data
+string: .asciiz "abab"
+.text
+main:
+	la $t0, string
+	lb $t1, string
+	li $t2, 0
+	loop:
+		bnez $t1, endloop
+
+		# PUSH
+		sb $sp, 0($t1)
+		add $sp, 1
+
+		add $t0, 1
+		lb $t1, 0($t0)
+		add $t2, 1
+		j loop
+	endloop:
+
+
+	la $t0, string
+	lb $t1, string
+	li $t2, 0
+	li $t3, 1
+	loop2:
+		beqz $t3, endloop2
+		bnez $t1, endloop2
+
+		# POP
+		sub $sp, 1
+		lb $t4, 0($sp)
+
+		seq $t3, $t4, $t1
+
+		add $t0, 1
+		lb $t1, 0($t0)
+		j loop2
+	endloop2:
+
+	li $v0, 10
+	syscall
+
+
+1. Fie şirul următor definit recursiv:
+a 1 = 1;
+a 2 = 2;
+a n = 3*a n-2 + a n-1 .
+Determinaţi al 5-lea element al şirului, folosind o subrutină care primeşte 2
+termeni consecutivi şi întoarce următorul element al şirului.
+a3 = 3 * 1 + 2 = 5
+a4 = 3 * 2 + 5 = 11
+a5 = 3 * 5 + 11 = 15 + 11 = 26
+
+.data
+.text
+main:
+	li $s0, 1
+	li $s1, 2
+
+	move $a0, $s0
+	move $a1, $s1
+	jal sir
+	move $s2, $v0
+
+	move $a0, $s1
+	move $a1, $s2
+	jal sir
+	move $s3, $v0
+
+	move $a0, $s2
+	move $a1, $s3
+	jal sir
+	move $s4, $v0
+
+	li $v0, 10
+	syscall
+sir:
+	move $t0, $a0
+	move $t1, $a1
+	move $t2, $t0
+	mul $t2, $t2, 3
+	add $t2, $t2, $t1
+	move $v0, $t2
+	jr $ra
+	
+
+
+2. Determinaţi lungimea maximă a unei secvenţe de caractere repetitive
+dintr-un şir de caractere. De exemplu pentru şirul „aaabbcdddee” se va
+întoarce 3, fiindcă „aaa” şi „ddd” au lungimea maximă, egală cu 3.
+.data
+	string: .asciiz ""
+.text
+main:
+
+li $v0, 5
+syscall
+move $s1, $v0
+
+li $v0, 8
+la $a0, string
+move $t0, $s1
+add $t0, 1
+move $a1, $t0
+syscall
+
+la $s0, string
+lb $s2, 0($s0)
+
+li $s7, -1
+
+while1:
+	beqz $s2,	endwhile1
+	
+	move $t0, $s0
+	add $t0, 1
+	lb $s3, 0($t0)
+	li $s4, 1	# max
+
+	while2:
+		beqz $s3, endwhile2
+		bne $s2, $s3, endwhile2
+		
+		add $t0, 1
+		lb $s3, 0($t0)
+		add $s4, 1
+
+		add $s0, 1
+		j while2
+	endwhile2:
+
+	ble $s4, $s7, ok
+	move $s7, $s4
+	ok:
+
+	add $s0, 1
+	lb $s2, 0($s0)
+	j while1
+endwhile1:
+
+li $v0, 10
+syscall
+
+
+3. Se citesc de la consolă un număr natural şi o cifră. Să se afişeze „Da” dacă
+printre cifrele numărului citit se găseşte această cifră şi „Nu” în caz
+contrar.
+.data
+	da: .asciiz "Da"
+	nu: .asciiz "Nu"
+.text
+main:
+	li $v0, 5
+	syscall
+	move $s0, $a0
+
+	li $v0, 5
+	syscall
+	move $s1, $a0
+	
+	while:
+		beqz $s0, afisare_nu
+		rem $s2, $s0, 10
+		beq $s1, $s2, afisare_da
+		div $s0, $s0, 10
+		j while
+
+afisare_da:
+	li $v0, 4
+	la $a0, da
+	syscall
+	j sfarsit
+
+afisare_nu:
+	li $v0, 4
+	la $a0, nu
+	syscall
+
+sfarsit:
+	li $v0, 10
+	syscall
+
+4. Să se determine dacă o matrice are numai elemente impare pe diagonala
+principală.
+.data
+n: .word 3
+v: .word 1, 2, 3, 4, 256, 6, 7, 8, 9
+.text
+main:
+	li $s0, 0
+	lw $s1, n
+	li $s2, 1
+	loop:
+		beq $s0, $s1, endloop
+		beq $s2, $0, endloop
+		
+		la $s3, v
+		move $s4, $s1
+		mul $s4, $s4, $s0
+		add $s4, $s4, $s0
+		mul $s4, $s4, 4
+		add $s3, $s3, $s4
+		lw $s5, 0($s3)
+
+		li $v0, 1
+		move $a0, $s5
+		syscall
+
+		and $s2, $s5, 0x1
+
+		add $s0, 1
+		j loop
+	endloop:
+
+	li $v0, 10
+	syscall
+
+5. Ordonaţi crescător un vector de numere întregi.
+.data
+n: .word 6
+v: .word 3, 25, 51, 432, 10, 6
+blank: .asciiz " "
+newline: .asciiz "\n"
+.text
+main:
+	li $s0, 0		# s0 - i
+					# s1 - j
+	lw $s2, n		# s2 - n - 1
+	sub $s2, 1
+
+	lw $s3, n		# s3 - n
+	la $s4, v		# s4 - i iterator
+					# s5 - j iterator
+
+	lw $s6, 0($s4)		# s6 - i element
+						# s7 - j element
+	
+	loop1:
+		beq $s0, $s2, endloop1
+			
+		move $s1, $s0				# j = i
+		add $s1, 1		 			# j = j + 1
+
+		la $s5, v					# s5 - j iterator
+		move $t0, $s1
+		mul $t0, $t0, 4
+		add $s5, $s5, $t0
+		lw $s7, 0($s5)					# j element
+
+		loop2:
+			beq $s1, $s3, endloop2
+			
+			# incarca doua elemente din vector in memoria principala
+			# comparam s6 cu s7
+			sle $s8, $s6, $s7		# sle - Set on Less Than or Equal
+			# data s8 este 1, adica s6 <= s7, atunci nu interschimba
+
+			bnez $s8, nu_interschimba # bnez - Branch on Not Equal to Zero
+			move $a0, $s4
+			move $a1, $s5
+			jal swap
+			nu_interschimba:
+
+			add $s5, 4		# increment j iterator
+			add $s1, 1		# increment j
+			lw $s7, 0($s5)  # j element
+			j loop2
+		endloop2:
+
+		add $s4, 4		# increment i iterator
+		add $s0, 1		# increment i
+		lw $s6, 0($s4)	# i element
+		j loop1
+	endloop1:
+
+	li $s0, 0
+	lw $s1, n
+	la $s2, v
+	loop3:
+		beq $s0, $s1, endloop3
+		li $v0, 1
+		lw $a0, 0($s2)
+		syscall
+		li $v0, 4
+		la $a0, blank
+		syscall
+		add $s2, 4
+		add $s0, 1
+		j loop3
+	endloop3:
+
+	li $v0, 10
+	syscall
+
+compare:
+	
+swap:
+	lw $t0, 0($a0)
+	lw $t1, 0($a1)
+
+	move $t2, $t0
+	move $t0, $t1
+	move $t1, $t2
+	
+	sw $t0, 0($a0)
+	sw $t1, 0($a1)
+	jr $ra
