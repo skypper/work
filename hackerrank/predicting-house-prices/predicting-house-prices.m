@@ -1,5 +1,3 @@
-clear; close all; clc;
-
 function J = computeCost(X, y, theta)
 	m = length(y);
 	J = 1 / (2 * m) * sum((X * theta - y) .^ 2);
@@ -15,16 +13,15 @@ function [theta, J_history] = gradientDescent(X, y, theta, alpha, num_iter)
 end
 
 % Reading input
-fid = fopen('predicting-house-prices.in', 'r');
-F = fscanf(fid, '%d', 1);
-N = fscanf(fid, '%d', 1);
-A = fscanf(fid, '%f', [F + 1, N]);
+F = scanf('%d', 1);
+N = scanf('%d', 1);
+A = scanf('%f', [F + 1, N]);
 A = A';
 X = A(:, 1 : F);
 y = A(:, F + 1);
 
-T = fscanf(fid, '%d', 1);
-P = fscanf(fid, '%f', [F, T]);
+T = scanf('%d', 1);
+P = scanf('%f', [F, T]);
 P = P';
 P = [ones(rows(P), 1), P];
 
@@ -41,13 +38,8 @@ alpha = 0.0005;
 
 [theta, J_history] = gradientDescent(X, y, theta, alpha, iterations);
 
-#figure;
-#plot((1 : iterations), J_history, 'rx');
-#plot(X(:, 2), y, 'rx');
-#hold on;
-#plot(X(:, 2), X * theta, '-');
-#legend('Training data', 'Liniar regression');
-#hold off;
+figure;
+plot((1 : iterations), J_history, 'rx');
 
 ans = P * theta;
 disp(ans);
