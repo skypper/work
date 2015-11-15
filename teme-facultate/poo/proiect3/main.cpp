@@ -8,6 +8,19 @@
 using namespace std;
 
 int main() {
+    lista<int> a;
+    a.adauga_nod(1);
+    a.adauga_nod(2);
+    a.adauga_nod(3);
+    a.adauga_nod(4);
+    a.adauga_nod(5);
+    for (int x : a) {
+        cout << x << " ";
+    }
+    return 0;
+}
+
+int main2() {
     ifstream fin("graf_neorientat.in");
     ifstream fin2("graf_neorientat2.in");
     ifstream fin3("arbore.in");

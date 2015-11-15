@@ -1,5 +1,4 @@
-#ifndef LISTA_H_INCLUDED
-#define LISTA_H_INCLUDED
+#pragma once
 
 #include <iostream>
 #include <cstdlib>
@@ -8,9 +7,15 @@
 
 using namespace std;
 
+template <class cheie> class iterator_lista;
+
 template <class cheie>
 class lista {
+    friend class iterator_lista<cheie>;
 public:
+    typedef iterator_lista<cheie> iterator;
+    typedef cheie value_type;
+
     struct nod {
         cheie info;
         nod *urm;
@@ -39,6 +44,9 @@ public:
     void elimina(nod*);
     void eliberare();
     int lungime();
+
+    iterator begin();
+    iterator end();
 };
 
 
@@ -285,4 +293,31 @@ lista<int> operator+(const lista<int> &L1, const lista<int> &L2) {
     return rezultat;
 }
 
-#endif // LISTA_H_INCLUDED
+template <class cheie>
+typename lista<cheie>::iterator lista<cheie>::begin() {
+    return iterator(prim);
+}
+
+template <class cheie>
+typename lista<cheie>::iterator lista<cheie>::end() {
+    return iterator(NULL);
+}
+
+template <class cheie>
+class iterator_lista {
+    typename lista<cheie>::nod *pNod;
+public:
+    iterator_lista(typename lista<cheie>::nod *pNod): pNod(pNod) {}
+    void operator++() {
+        pNod = pNod->urm;
+    }
+    bool operator==(const typename lista<cheie>::iterator &x) const {
+        return pNod == x.pNod;
+    }
+    bool operator!=(const typename lista<cheie>::iterator &x) const {
+        return pNod != x.pNod;
+    }
+    cheie operator*() const {
+        return pNod->info;
+    }
+};
