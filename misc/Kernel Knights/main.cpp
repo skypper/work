@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include <queue>
 
 using namespace std;
 
@@ -30,18 +29,10 @@ int main()
         marked[i] = 1;
     }
 
-    queue<int> Q;
     for (int i = n + 1; i <= 2 * n; ++i) {
-        Q.push(i);
-    }
-    while (!Q.empty()) {
-        int i = Q.front();
-        Q.pop();
-
         marked[i] = 1;
         for (int x : challenged_by[i]) {
             marked[x] = 0;
-            Q.push(x);
         }
     }
 
