@@ -27,7 +27,7 @@ bool func(int num) {
 
 int main()
 {
-    //freopen("input", "r", stdin);
+    freopen("input", "r", stdin);
 
     cin >> t;
     while (t--) {
