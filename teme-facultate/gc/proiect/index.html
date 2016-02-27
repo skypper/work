@@ -1,0 +1,146 @@
+<html>
+<head>
+	<meta charset="utf-8">
+  <title>Convex Hull</title>
+
+  <script src="jquery-2.2.0.js"></script>
+</head>
+<body>
+<script>
+
+var translateX = 0;
+var translateY = 0;
+
+var pts = [];
+
+function cross_product(O, A, B) {
+  return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+}
+
+var canvas = {
+	/*
+	Helper function to get the position of a click on the canvas.
+	*/
+	getXY: function(e) {
+		var c = document.getElementById("myCanvas");
+	  var rect = c.getBoundingClientRect();
+	  return {x: e.clientX - rect.left, y: e.clientY - rect.top}
+	},
+	draw_point: function(pt) {
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		ctx.fillRect(pt.x, pt.y, 1, 1);
+	},
+	draw_points: function() {
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+
+		for (var i = 0; i < pts.length; ++i) {
+			canvas.draw_point({"x": translateX + pts[i].x, "y": translateY + pts[i].y});
+		}
+	},
+	draw_hull: function(hull) {
+		canvas.clear_canvas();
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+
+		for (var i = 0; i < hull.length; ++i) {
+			ctx.moveTo(translateX + hull[i].x, translateY + hull[i].y);
+			ctx.lineTo(translateX + hull[(i + 1) % hull.length].x, translateY + hull[(i + 1) % hull.length].y);
+			ctx.stroke();
+		}
+
+		canvas.draw_points();
+	},
+	clear_canvas: function() {
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+
+		ctx.clearRect(0, 0, c.width, c.height);
+		ctx.beginPath();
+	}
+};
+
+/*
+Compute the convex hull using Graham Scan algorithm.
+*/
+function get_hull() {
+	var n = pts.length;
+
+	var INF = 100000;
+	var min_point = {"x": INF, "y": INF}, minIdx = 0;
+	for (var i = 0; i < n; ++i) {
+		if (pts[i].x < min_point.x || (pts[i].x == min_point.x && pts[i].y < min_point.y)) {
+			minIdx = i;
+			min_point = pts[i];
+		}
+	}
+	pts[minIdx] = pts[pts.length - 1];
+	pts.pop();
+	pts.sort(function(A, B) {
+		return cross_product(min_point, A, B) >= 0;
+	});
+	pts.unshift(min_point);
+
+	var hull = [];
+	hull.push(pts[0]);
+	hull.push(pts[1]);
+	for (var i = 2; i < n; ++i) {
+		var top = hull.length - 1;
+		var top_second = hull.length - 2;
+		while (hull.length >= 2 && cross_product(hull[top_second], hull[top], pts[i]) > 0) {
+			hull.pop();
+
+			--top;
+			--top_second;
+		}
+		hull.push(pts[i]);
+	}
+	console.log(hull);
+	return hull;
+}
+
+$(document).ready(function() {
+	$.ajaxSetup({beforeSend: function(xhr){
+	  if (xhr.overrideMimeType)
+	  {
+	    xhr.overrideMimeType("application/json");
+	  }
+	}
+	});
+
+	/*
+	Setup the test dataset points.json.
+	*/
+	var jqxhr = $.getJSON("./points.json", function(data) {
+	  pts = data["points"];
+
+		canvas.draw_points();
+		canvas.draw_hull(get_hull());
+	});
+
+	$("#myCanvas").on("click", function(e) {
+		var pos = canvas.getXY(e);
+		var pt = {"x": pos.x, "y": pos.y};
+		canvas.draw_point(pt);
+		pts.push(pt);
+	});
+	$("#drawHull").on("click", function() {
+		canvas.draw_hull(get_hull());
+	})
+	$("#resetCanvas").on("click", function() {
+		canvas.clear_canvas();
+		pts = [];
+	});
+});
+</script>
+
+<div>
+	<canvas id="myCanvas" width="200" height="200" style="border:1px solid #000000;">
+	</canvas>
+</div>
+<hr />
+<button id="drawHull">Draw Hull</button>
+<button id="resetCanvas">Reset Canvas</button>
+</body>
+</html>
